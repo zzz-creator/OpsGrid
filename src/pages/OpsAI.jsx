@@ -79,8 +79,10 @@ Your capabilities:
 
 Be concise, actionable, and use markdown formatting. Use bullet points for lists. Highlight critical issues.`;
 
+    const geminiApiKey = (() => { try { return JSON.parse(localStorage.getItem('opsgrid_settings') || '{}').geminiApiKey || ''; } catch { return ''; } })();
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `${systemPrompt}\n\nUser: ${msg}`,
+      apiKey: geminiApiKey,
     });
 
     setMessages(p => [...p, { role: 'assistant', content: result }]);
@@ -94,8 +96,10 @@ Be concise, actionable, and use markdown formatting. Use bullet points for lists
     setLoading(true);
     const ctx = context || await gatherContext();
 
+    const geminiApiKey2 = (() => { try { return JSON.parse(localStorage.getItem('opsgrid_settings') || '{}').geminiApiKey || ''; } catch { return ''; } })();
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `Generate a structured incident report in markdown for an operations team. System state: ${ctx.summary}. Alerts: ${ctx.alerts.map(a => `[${a.severity}] ${a.message} from ${a.source}`).join('; ')}. Open incidents: ${ctx.incidents.map(i => `${i.title} - ${i.status}`).join('; ')}. Include: Executive Summary, Current Status, Active Issues, Risk Assessment, and Recommended Actions.`,
+      apiKey: geminiApiKey2,
     });
 
     setMessages(p => [...p, { role: 'assistant', content: result }]);

@@ -22,6 +22,8 @@ import SimulationLab from '@/pages/SimulationLab';
 import Computers from '@/pages/Computers.jsx';
 import WorkspaceControl from '@/pages/WorkspaceControl';
 import IncidentResolution from '@/pages/IncidentResolution';
+import LoginPage from '@/components/auth/LoginPage';
+import { StaticbotLoginBoundary } from '@/components/auth/LoginPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +50,7 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/alerts" element={<Alerts />} />
@@ -74,7 +77,9 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <StaticbotLoginBoundary>
           <AuthenticatedApp />
+          </StaticbotLoginBoundary>
         </Router>
         <Toaster />
       </QueryClientProvider>

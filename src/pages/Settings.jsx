@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Settings, Bell, Shield, Database, Sliders, Save } from 'lucide-react';
+import { Settings, Bell, Shield, Database, Sliders, Save, Key } from 'lucide-react';
 import { toast } from 'sonner';
 import TwoFactorAuth from '@/components/settings/TwoFactorAuth';
 
@@ -34,12 +34,24 @@ const sections = [
       { key: 'mfa', label: '2FA Required', description: 'Require two-factor authentication', type: 'toggle', default: false },
     ]
   },
+  {
+    id: 'ai',
+    icon: Key,
+    label: 'AI (Gemini)',
+    settings: [
+      { key: 'geminiApiKey', label: 'Gemini API Key', description: 'User-provided Google Gemini API key used by Ops AI', type: 'text', default: '' },
+    ]
+  },
 ];
 
 export default function SettingsPage() {
   const [values, setValues] = useState(() => {
     const initial = {};
     sections.forEach(s => s.settings.forEach(set => { initial[set.key] = set.default; }));
+    try {
+      const stored = localStorage.getItem('opsgrid_settings');
+      if (stored) Object.assign(initial, JSON.parse(stored));
+    } catch {}
     return initial;
   });
   const [saved, setSaved] = useState(false);
@@ -47,6 +59,7 @@ export default function SettingsPage() {
   const update = (key, val) => setValues(p => ({ ...p, [key]: val }));
 
   const save = () => {
+    try { localStorage.setItem('opsgrid_settings', JSON.stringify(values)); } catch {}
     toast.success('Settings saved', { description: 'Configuration updated successfully' });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -106,6 +119,13 @@ export default function SettingsPage() {
                           values[setting.key] ? 'translate-x-5' : 'translate-x-0.5'
                         }`} />
                       </button>
+                    ) : setting.type === 'text' ? (
+                      <input
+                        type="text"
+                        value={values[setting.key] || ''}
+                        onChange={e => update(setting.key, e.target.value)}
+                        className="w-64 h-8 bg-input border border-border rounded-md px-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-neon-blue"
+                      />
                     ) : (
                       <input
                         type="number"

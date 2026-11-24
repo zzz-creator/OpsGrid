@@ -46,8 +46,10 @@ export default function GlobalCommandBar({ onClose }) {
 
     const context = `Active alerts: ${alerts.map(a => `[${a.severity}] ${a.message}`).join('; ')}. Recent events: ${events.map(e => e.description).join('; ')}.`;
 
+    const geminiApiKey = (() => { try { return JSON.parse(localStorage.getItem('opsgrid_settings') || '{}').geminiApiKey || ''; } catch { return ''; } })();
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `You are OpsGrid AI assistant. System context: ${context}. User question: ${query}. Answer concisely in 2-3 sentences.`,
+      apiKey: geminiApiKey,
     });
     setAiAnswer(result);
     setAiLoading(false);
